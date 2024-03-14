@@ -9,10 +9,12 @@ downloadPeakFiles() {
   # Get all ATAC .narrowPeak files (excluding Gill)
   # Download all of them
   curl -s "$LIST_URL" | grep -e "^bigDataUrl .*ATAC.*bigNarrowPeak$" | grep -v "Gill" |\
-    sed "s|bigDataUrl |$BASE_URL|; s|\.bigNarrowPeak$|\.narrowPeak|" |\
+    sed "s|bigDataUrl |$BASE_URL/|; s|\.bigNarrowPeak$|\.narrowPeak|" |\
     while IFS= read -r file_url; do
       echo Downloading $file_url
-      curl -O "$file_url"
+      if ! curl -s -f -O "$file_url"; then
+        echo "ERROR: Failed to download $file_url"
+      fi
     done
 }
 
@@ -24,3 +26,11 @@ cd $OUTDIR
 downloadPeakFiles "https://salmobase.org/datafiles/datasets/Aqua-Faang/trackhub/AtlanticSalmon/DevMap/trackDb.txt"
 downloadPeakFiles "https://salmobase.org/datafiles/datasets/Aqua-Faang/trackhub/AtlanticSalmon/BodyMap/trackDb.txt"
 cd -
+
+mkdir "downloads/blacklist"
+curl https://salmobase.org/datafiles/datasets/Aqua-Faang/blacklist/AtlanticSalmon_blacklist.bed \
+  -o downloads/blacklist/AtlanticSalmon_blacklist.bed
+
+# sort the blacklist
+mkdir -p "data/blacklist"
+sort -k1,1 -k2,2n downloads/blacklist/AtlanticSalmon_blacklist.bed > data/blacklist/AtlanticSalmon_blacklist_sorted.bed
