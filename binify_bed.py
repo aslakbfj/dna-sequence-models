@@ -167,9 +167,9 @@ def main(bedlist, fasta, outfile, exclude, seq_length, bin_width, min_overlap):
     if os.path.exists(fasta+".fai"):
         genome_fasta = Fasta(fasta)
     else:
-        print("Indexing fasta file...",end="")
+        click.echo("Indexing fasta file...")
         genome_fasta = Fasta(fasta)
-        print("done.")
+        click.echo("Indexing complete.")
 
     with open(outfile, 'w') as file:
       multibed_to_tsv(peakfiles, bin_width, min_overlap, outstream=file, 
