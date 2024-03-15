@@ -13,8 +13,8 @@ class BedBinner:
         self.bin = -1
         self.chr = ""
         self.overlap = 0
-        self.nextLine()
-    def nextLine(self):
+        self.__nextLine()
+    def __nextLine(self):
         next_line = self.file.readline()
         if not next_line:
             self.file.close()
@@ -45,7 +45,7 @@ class BedBinner:
               # in that case we should move to the next bin 
               self.nextBin()
             else:
-              self.nextLine()
+              self.__nextLine()
     def nextBin(self):
         if( self.bin == None):
           return
@@ -55,7 +55,7 @@ class BedBinner:
         self.overlap = max(0, min(self.end, self.bin + self.bin_width) - max(self.start,self.bin))
         #print(f'overlap =  {self.overlap}')
         if( self.overlap < self.min_overlap ):
-            self.nextLine()
+            self.__nextLine()
     @property
     def currentBin(self):
         if( self.bin == None):
@@ -97,7 +97,6 @@ class MultiBedbinner:
         return (nextbin,binValues)
     
 
-# TODO: implement blacklisting
 def multibed_to_tsv(peakfiles, bin_width, min_overlap, outstream, genome_fasta, seq_length, exclude):
     if exclude:
         # optianally add blacklist as first bed file
