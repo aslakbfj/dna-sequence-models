@@ -6,7 +6,7 @@ This repo currently contain scripts for preparing training data for ML models th
 
 "download_from_salmobase.sh" - downloads peak files, blacklist file and fasta file
 
-"binify_bed.py" - reads multiple bed files (with non-overlapping regions) and divides it into bins of certain size (default: 200) and outputs the bins where atleast one of the files had a peak that overlaps the bin with more than a given number of bases (default 50% of bin). The sequence for that bin is also extracted from a given fasta file.
+"binify_bed.py" - reads multiple bed files (with non-overlapping regions) and divides it into bins of certain size (default: 200) and outputs the bins where atleast one of the files had a peak that overlaps the bin with more than a given number of bases (default 50% of bin). The sequence for that bin is also extracted from a given fasta file. I also supports blacklists, i.e. a bed file of regions to exclude.
 
 
 Example:
