@@ -34,3 +34,9 @@ curl https://salmobase.org/datafiles/datasets/Aqua-Faang/blacklist/AtlanticSalmo
 # sort the blacklist
 mkdir -p "data/blacklist"
 sort -k1,1 -k2,2n downloads/blacklist/AtlanticSalmon_blacklist.bed > data/blacklist/AtlanticSalmon_blacklist_sorted.bed
+
+# download genome
+mkdir -p "downloads/genome"
+cd "downloads/genome"
+curl -O "http://ftp.ensembl.org/pub/release-106/fasta/salmo_salar/dna/Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa.gz"
+cd -

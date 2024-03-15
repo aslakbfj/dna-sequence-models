@@ -1,5 +1,8 @@
-
+import time
+import os
+import click
 import heapq
+from pyfaidx import Fasta
 
 class BedBinner:
     def __init__(self, file_path, bin_width=200, min_overlap=100):
@@ -92,3 +95,86 @@ class MultiBedbinner:
               heapq.heappush(self.pq, (bin, i ))
         
         return (nextbin,binValues)
+    
+
+# TODO: implement blacklisting
+def multibed_to_tsv(peakfiles, bin_width, min_overlap, outstream, genome_fasta, seq_length, exclude):
+    if exclude:
+        # optianally add blacklist as first bed file
+        peakfiles = [exclude] + peakfiles
+
+    last_update_time = time.time() - 1  # Initialize to ensure immediate first update
+    bins_output = 0
+    excluded_bins = 0
+
+    for ((chr,bin_start), binValues) in MultiBedbinner(peakfiles, bin_width, min_overlap):
+      if exclude:
+          # skip if this bin is in an exclusion region
+          if binValues[0] == 1:
+              if sum(binValues[1:])>0: # check if there was any peaks in the bin anyway
+                excluded_bins += 1
+              continue
+          binValues = binValues[1:] # drop the exclude value
+
+      seq_start=bin_start+ bin_width//2 - seq_length//2
+      seq_end=seq_start+seq_length
+      seq = genome_fasta[chr][seq_start:seq_end].seq
+      seq = seq.upper() # perhaps check for N's
+      outstream.write(f'{chr}:{seq_start+1}-{seq_end}\t{seq}\t' + '\t'.join(map(str, binValues)) + "\n")
+
+      bins_output += 1
+      if time.time() - last_update_time >= 1:
+          progress_message = f"Current chr: {chr}, Bins output: {bins_output}"
+          if exclude:
+              progress_message += f", Excluded bins: {excluded_bins}"
+          print(progress_message)
+          last_update_time = time.time()
+
+    # Print final count
+    progress_message = f"Total bins output: {bins_output}"
+    if exclude:
+        progress_message += f", Total excluded bins: {excluded_bins}"
+    print(progress_message)
+
+
+# get command line parameters
+@click.command()
+@click.option('--bedlist', type=click.Path(exists=True), required=True, help='A file containing a list of paths to bed files (one per line).')
+@click.option('--fasta', type=click.Path(exists=True), required=True, help='Genome sequence fasta file.')
+@click.option('--outfile', type=click.Path(), required=True, help='Output .tsv file.')
+@click.option('--exclude', type=click.Path(exists=True), default=None, help='(Optional) A bed file with regions to exclude, a.k.a. blacklist.')
+@click.option('--seq_length', type=int, default=1000, help='Number of basepairs to extract per window (default: 1000).')
+@click.option('--bin_width', type=int, default=200, help='Bin width in number of basepairs (default: 200).')
+@click.option('--min_overlap', type=int, default=None, help='Minimum overlap between peaks and bin in number of basepairs (default: bin_width/2).')
+
+
+def main(bedlist, fasta, outfile, exclude, seq_length, bin_width, min_overlap):
+    if min_overlap is None:
+        min_overlap = bin_width // 2
+    
+    click.echo(f"Bedlist file: {bedlist}")
+    with open(bedlist, 'r') as file:
+        peakfiles = file.readlines()
+    peakfiles = [line.strip() for line in peakfiles]
+    click.echo(f"  Number of bed files: {len(peakfiles)}")
+
+    click.echo(f"Exclude file: {exclude}" if exclude else "Exclude file: None")
+    click.echo(f"Fasta file: {fasta}")
+    click.echo(f"Sequence length: {seq_length}")
+    click.echo(f"Bin width: {bin_width}")
+    click.echo(f"Minimum overlap: {min_overlap}")
+
+    if os.path.exists(fasta+".fai"):
+        genome_fasta = Fasta(fasta)
+    else:
+        print("Indexing fasta file...",end="")
+        genome_fasta = Fasta(fasta)
+        print("done.")
+
+    with open(outfile, 'w') as file:
+      multibed_to_tsv(peakfiles, bin_width, min_overlap, outstream=file, 
+                      genome_fasta=genome_fasta, seq_length=seq_length,
+                      exclude = exclude)
+
+if __name__ == '__main__':
+    main()
