@@ -2,11 +2,11 @@
 
 **work in progress**
 
-This repo currently contain scripts for preparing training data for ML models that genomic sequences.
+This repo currently contain scripts for preparing training data for ML models that predict ATAC-seq peak data from genomic sequences.
 
-"download_from_salmobase.sh" - downloads peak files, blacklist file and fasta file
+"download_from_salmobase.sh" - downloads peak files, blacklist file from salmobase.org and fasta file from Ensembl.
 
-"binify_bed.py" - reads multiple bed files (with non-overlapping regions) and divides it into bins of certain size (default: 200) and outputs the bins where atleast one of the files had a peak that overlaps the bin with more than a given number of bases (default 50% of bin). The sequence for that bin is also extracted from a given fasta file. I also supports blacklists, i.e. a bed file of regions to exclude.
+"binify_bed.py" - reads multiple peak files (bed files with non-overlapping regions) and divides the genome into bins of certain size (default: 200 basepairs) and outputs the bins where atleast one of the files had a peak that overlaps the bin with more than a given number of bases (default 50% of bin). The sequence for that bin is also extracted from a given fasta file. I also supports blacklists, i.e. a bed file of regions to exclude.
 
 
 Example:
