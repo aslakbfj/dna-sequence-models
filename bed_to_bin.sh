@@ -5,6 +5,7 @@
 #find $OUTDIR -name "*.narrowPeak" > bed_list_test.txt
 source activate explainn
 # make bins: default 200 bin width and seq length 1000
+SALMON_FOLDER=/mnt/SCRATCH/asfj/downloads/genomes/salmon/data
 binify_bed.py \
   --bedlist bed_list_test.txt \
   --fasta downloads/genome/Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa \
@@ -21,12 +22,9 @@ tail -n +2 ../tutorial/AI-TAC/mouse_peak_heights.csv | cut -d "," -f 1 \
 > ./AI-TAC/AI-TAC_ids.txt
 #Get peak heights
 tail -n +2 ../tutorial/AI-TAC/mouse_peak_heights.csv | cut -d "," -f 2- | \
-tr "," "\t" > ./AI-TAC/AI-TAC_heights.txt
-#### Make binary peak heigths
-awk -v OFS="\t" '{for(i=1; i<=NF; i++) if($i > 2) $i=1; else $i=0} 1' ./AI-TAC/AI-TAC_heights.txt > ./AI-TAC/AI-TAC_binary_heights.txt
-
+tr "," "\t" > ./AI-TAC/AS-TAC_heights.txt
 
 paste -d "\t" ./AI-TAC/AI-TAC_ids.txt ./AI-TAC/AI-TAC_sequences.txt \
-./AI-TAC/AI-TAC_binary_heights.txt > AI-TAC/AI-TAC_251bp.tsv
+./AI-TAC/AI-TAC_binary_heights.txt > AI-TAC/AI-TAC_1000bp.tsv
 awk 'BEGIN {srand()} {f = FILENAME (rand() <= 0.1 ? ".validation" : ".train");
 print > f}' ./AI-TAC/AI-TAC_251bp.tsv

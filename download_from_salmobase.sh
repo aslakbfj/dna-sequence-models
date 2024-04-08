@@ -19,25 +19,26 @@ downloadPeakFiles() {
 }
 
 
-OUTDIR=/mnt/SCRATCH/asfj/downloads/genomes/salmon/AS-TAC-peaks
+OUTDIR=/mnt/SCRATCH/asfj/downloads/genomes/salmon
 mkdir -p $OUTDIR
 
 cd $OUTDIR
+mkdir AS-TAC-peaks
+cd AS-TAC-peaks
 downloadPeakFiles "https://salmobase.org/datafiles/datasets/Aqua-Faang/trackhub/AtlanticSalmon/DevMap/trackDb.txt"
 downloadPeakFiles "https://salmobase.org/datafiles/datasets/Aqua-Faang/trackhub/AtlanticSalmon/BodyMap/trackDb.txt"
-cd -
+cd ..
 
 mkdir "blacklist"
 curl https://salmobase.org/datafiles/datasets/Aqua-Faang/blacklist/AtlanticSalmon_blacklist.bed \
-  -o blacklist/AtlanticSalmon_blacklist.bed
+  -o $OUTDIR/blacklist/AtlanticSalmon_blacklist.bed
 
 # sort the blacklist
-mkdir -p "data/blacklist"
-sort -k1,1 -k2,2n blacklist/AtlanticSalmon_blacklist.bed > data/blacklist/AtlanticSalmon_blacklist_sorted.bed
+sort -k1,1 -k2,2n $OUTDIR/blacklist/AtlanticSalmon_blacklist.bed > $OUTDIR/blacklist/AtlanticSalmon_blacklist_sorted.bed
 
 # download genome
-mkdir -p "downloads/genome"
-cd "downloads/genome"
+mkdir  genome
+cd genome
 curl -O "http://ftp.ensembl.org/pub/release-106/fasta/salmo_salar/dna/Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa.gz"
-#gzip -d Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa.gz
-cd -
+gzip -d Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa.gz
+
