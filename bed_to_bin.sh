@@ -3,6 +3,7 @@
 
 
 source activate explainn
+echo $PWD
 script_dir=$PWD
 SALMON_FOLDER=/mnt/SCRATCH/asfj/downloads/genomes/salmon #where the salmon download is located
 DATA_FOLDER=/mnt/SCRATCH/asfj/AS-TAC #where you want to store the entire bed file
@@ -15,7 +16,7 @@ find AS-TAC-peaks -name "*.narrowPeak" > bed_list_test.txt
 
 # make bins: default 200 bin width and seq length 1000
 cd $script_dir
-binify_bed.py \
+python binify_bed.py \
   --bedlist bed_list_test.txt \
   --fasta genome/Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa \
   --outfile $DATA_FOLDER/AS-TAC_1000bp.tsv \
