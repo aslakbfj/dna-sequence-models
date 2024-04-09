@@ -118,8 +118,9 @@ def multibed_to_tsv(peakfiles, bin_width, min_overlap, outstream, genome_fasta, 
       seq_start=bin_start+ bin_width//2 - seq_length//2
       seq_end=seq_start+seq_length
       seq = genome_fasta[chr][seq_start:seq_end].seq
-      seq = seq.upper() # perhaps check for N's
-      outstream.write(f'{chr}:{seq_start+1}-{seq_end}\t{seq}\t' + '\t'.join(map(str, binValues)) + "\n")
+      seq = seq.upper() # perhaps check for N's, because there are a lot of N's
+      if len(seq) > 1:
+        outstream.write(f'{chr}:{seq_start+1}-{seq_end}\t{seq}\t' + '\t'.join(map(str, binValues)) + "\n")
 
       bins_output += 1
       if time.time() - last_update_time >= 1:

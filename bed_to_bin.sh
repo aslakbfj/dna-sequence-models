@@ -2,14 +2,14 @@
 
 #SBATCH --output=./slurm/bed_to_bin%j_%a.log # Stdout and stderr file
 
-
+# activate env such that python etc is available
 source activate explainn
 echo "environment activated"
 
-script_dir=$PWD
+script_dir=$PWD #path of binify_bed.py 
 SALMON_FOLDER=/mnt/SCRATCH/asfj/downloads/genomes/salmon #where the salmon download is located
 DATA_FOLDER=/mnt/SCRATCH/asfj/AS-TAC #where you want to store the entire bed file
-HOME_DATA=/mnt/users/asfj/Thesis/data/salmon
+HOME_DATA=/mnt/users/asfj/Thesis/data/salmon #where you want to store the training and validation files
 
 # make a file called "bed_list_test.txt" listing all bed file paths (one per line):
 cd $SALMON_FOLDER
