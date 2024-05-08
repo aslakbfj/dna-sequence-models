@@ -45,10 +45,10 @@ if [ -f $DATA_FOLDER/AS-TAC_21_25_test.tsv ]; then
   echo "21_25.tsv exists"
 else
     # make a subset of AS-TAC_1000bp.tsv of lines where the first column starts with "21" or "25"
-    echo "creating subset of AS-TAC_1000bp.tsv"
+    echo "creating testsubset of AS-TAC_1000bp.tsv for 21_25 with all classes"
     awk '$1 ~ /^21|^25/' $DATA_FOLDER/AS-TAC_1000bp.tsv > $DATA_FOLDER/AS-TAC_21_25_test.tsv
     # make a subset of the data that did not contain 21 or 25
-    echo "creating subset of AS-TAC_1000bp.tsv"
+    echo "creating train subset of AS-TAC_1000bp.tsv for 21_25 with all classes"
     awk '$1 !~ /^21|^25/' $DATA_FOLDER/AS-TAC_1000bp.tsv > $DATA_FOLDER/AS-TAC_21_25_train.tsv
 fi
 
@@ -58,10 +58,10 @@ if [ -f $DATA_FOLDER/AS-TAC_noMuscle_1000bp.tsv ]; then
   echo "AS-TAC_noMuscle_1000bp.tsv exists"
 else
   # Make other subsets of the data, where we remove classes 
-  echo "creating subset of AS-TAC_1000bp.tsv"
+  echo "creating subset of AS-TAC_1000bp.tsv without Muscle"
   cd $SALMON_FOLDER
   # remove all lines that contain "Muscle", "Gonad_Immature_Female_R2" or "Gonad_Mature_Male_R2" from bed_list_full.txt, and remove the corresponding columns from each line of AS-TAC_1000bp.tsv
-  awk '$0 !~ /Muscle/' bed_list_test.txt \
+  awk '$0 !~ /Muscle/' bed_list_full.txt \
   | awk '$0 !~ /Gonad_Immature_Female_R2/' \
   | awk '$0 !~ /Gonad_Mature_Male_R2/' > bed_list_noMuscle.txt
 
