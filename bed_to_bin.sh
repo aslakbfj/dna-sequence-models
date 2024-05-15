@@ -86,3 +86,37 @@ else
   awk '$1 !~ /^21|^25/' $DATA_FOLDER/AS-TAC_noMuscle_1000bp.tsv > $DATA_FOLDER/AS-TAC_noMuscle_21_25_train.tsv
 fi
 
+
+
+
+############################# BED TO BIN FOR MERGED PEAKS ########################################
+
+# If $DATA_FOLDER/AS-TAC_merged_1000bp.tsv does not exist, do the next
+if [ -f $DATA_FOLDER/AS-TAC_merged_1000bp.tsv ]; then
+  echo "AS-TAC_merged_1000bp.tsv exists"
+else
+  # make a file called "bed_list_merged.txt" listing all bed file paths, sorted (one per line):
+  cd $SALMON_FOLDER
+  echo "creating bed_list_merged.txt"
+  find AS-TAC-merged_peaks -name "*.narrowPeak" | sort > bed_list_merged.txt
+
+  # make bins: default 200 bin width and seq length 1000
+  echo "running python script"
+  python $script_dir/binify_bed.py \
+    --bedlist bed_list_merged.txt \
+    --fasta genome/Salmo_salar.Ssal_v3.1.dna_sm.toplevel.fa \
+    --outfile $DATA_FOLDER/AS-TAC_merged_1000bp.tsv \
+    --seq_length 1000 \
+    --exclude blacklist/AtlanticSalmon_blacklist_sorted.bed
+fi
+
+# make a subset of AS-TAC_merged_1000bp.tsv of lines where the first column starts with "21" or "25"
+if [ -f $DATA_FOLDER/AS-TAC_merged_21_25_test.tsv ]; then
+  echo "AS-TAC_merged_21_25_test.tsv exists"
+else
+  echo "creating subset of AS-TAC_merged_1000bp.tsv for 21_25 with all classes"
+  awk '$1 ~ /^21|^25/' $DATA_FOLDER/AS-TAC_merged_1000bp.tsv > $DATA_FOLDER/AS-TAC_merged_21_25_test.tsv
+  # make a subset of the data that did not contain 21 or 25
+  echo "creating subset of AS-TAC_merged_1000bp.tsv for 21_25 with all classes"
+  awk '$1 !~ /^21|^25/' $DATA_FOLDER/AS-TAC_merged_1000bp.tsv > $DATA_FOLDER/AS-TAC_merged_21_25_train.tsv
+fi
